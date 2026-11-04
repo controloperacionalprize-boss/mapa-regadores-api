@@ -3,8 +3,14 @@ import cors from "cors";
 import pg from "pg";
 
 const { Pool } = pg;
+
+const dbUrl = process.env.DATABASE_URL;
+const searchPathUrl = dbUrl.includes("?")
+  ? `${dbUrl}&options=-c%20search_path%3Ddva_mapa_regadores`
+  : `${dbUrl}?options=-c%20search_path%3Ddva_mapa_regadores`;
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: searchPathUrl,
   ssl: { rejectUnauthorized: false },
   max: 10,
 });
@@ -51,7 +57,7 @@ app.patch("/api/sessions", async (req, res) => {
 app.get("/api/sessions", async (req, res) => {
   try {
     const { usuario, limit } = req.query;
-    let query = `SELECT * FROM sesiones_gps WHERE app = 'mapa_regadores'`;
+    let query = `SELECT * FROM sesiones_gps WHERE app = 'dva_mapa_regadores'`;
     const params = [];
     if (usuario) {
       params.push(usuario);
